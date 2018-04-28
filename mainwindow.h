@@ -1,7 +1,13 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
+#include <QTimer>
+
+#include <Mcu.hpp>
+
+#include "instructionview.h"
+#include "registerview.h"
+#include "memoryview.h"
 
 class MainWindow : public QMainWindow
 {
@@ -10,6 +16,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
-};
 
-#endif // MAINWINDOW_H
+private:
+    Mcu mcu;
+
+    InstructionView* instructionView;
+    RegisterView* registerView;
+    MemoryView* memoryView;
+    QTimer* timer;
+};

@@ -27,7 +27,47 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        flagwidget.cpp \
+        instructionview.cpp \
+    disassemblymodel.cpp \
+    registerview.cpp \
+    registermodel.cpp \
+    memoryview.cpp \
+    memorymodel.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+        flagwidget.h \
+        instructionview.h \
+    disassemblymodel.h \
+    registerview.h \
+    registermodel.h \
+    memoryview.h \
+    memorymodel.h
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../emulator/cmake-build-debug/release/ -lemulator
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../emulator/cmake-build-debug/debug/ -lemulator
+else:unix: LIBS += -L$$PWD/../emulator/cmake-build-debug/ -lemulator
+
+INCLUDEPATH += $$PWD/../emulator/src
+DEPENDPATH += $$PWD/../emulator/src
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../emulator/cmake-build-debug/release/libemulator.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../emulator/cmake-build-debug/debug/libemulator.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../emulator/cmake-build-debug/release/emulator.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../emulator/cmake-build-debug/debug/emulator.lib
+else:unix: PRE_TARGETDEPS += $$PWD/../emulator/cmake-build-debug/libemulator.a
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../usr/local/Cellar/fmt/4.1.0/lib/release/ -lfmt
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../usr/local/Cellar/fmt/4.1.0/lib/debug/ -lfmt
+else:unix: LIBS += -L$$PWD/../../../../../usr/local/Cellar/fmt/4.1.0/lib/ -lfmt
+
+INCLUDEPATH += $$PWD/../../../../../usr/local/Cellar/fmt/4.1.0/include
+DEPENDPATH += $$PWD/../../../../../usr/local/Cellar/fmt/4.1.0/include
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/Cellar/fmt/4.1.0/lib/release/libfmt.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/Cellar/fmt/4.1.0/lib/debug/libfmt.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/Cellar/fmt/4.1.0/lib/release/fmt.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/Cellar/fmt/4.1.0/lib/debug/fmt.lib
+else:unix: PRE_TARGETDEPS += $$PWD/../../../../../usr/local/Cellar/fmt/4.1.0/lib/libfmt.a
