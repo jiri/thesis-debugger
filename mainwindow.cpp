@@ -15,15 +15,6 @@ MainWindow::MainWindow(QWidget* parent)
 {
     this->resize(800, 600);
 
-    /* Read whole binary file */
-    std::ifstream ifs("/Users/jiri/School/thesis/assembler/test", std::ios_base::binary | std::ios_base::ate);
-    auto size = ifs.tellg();
-    std::vector<u8> program(size);
-    ifs.seekg(0, std::ios_base::beg);
-    ifs.read(reinterpret_cast<char *>(program.data()), size);
-
-    this->mcu.load_program(program);
-
     /* Toolbar */
     QToolBar* toolBar = new QToolBar;
     toolBar->setMovable(false);
