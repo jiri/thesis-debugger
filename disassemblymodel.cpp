@@ -2,9 +2,10 @@
 
 #include <QFontDatabase>
 
-DisassemblyModel::DisassemblyModel(std::vector<DisassembledInstruction> instructions, QObject* parent)
+DisassemblyModel::DisassemblyModel(Mcu* mcu, QObject* parent)
     : QAbstractTableModel(parent)
-    , instructions(std::move(instructions))
+    , mcu(mcu)
+    , instructions(mcu->disassemble())
 { }
 
 int DisassemblyModel::rowCount(const QModelIndex& parent) const {
@@ -68,4 +69,8 @@ QVariant DisassemblyModel::headerData(int section, Qt::Orientation orientation, 
     }
 
     return {};
+}
+
+void DisassemblyModel::reload() {
+    this->instructions = this->mcu->disassemble();
 }

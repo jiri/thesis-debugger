@@ -8,7 +8,7 @@ class DisassemblyModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    DisassemblyModel(std::vector<DisassembledInstruction> instructions, QObject* parent = nullptr);
+    DisassemblyModel(Mcu* mcu, QObject* parent = nullptr);
     virtual ~DisassemblyModel() { }
 
     int rowCount(const QModelIndex& parent = {}) const override;
@@ -17,5 +17,9 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
 private:
+    Mcu* mcu = nullptr;
     std::vector<DisassembledInstruction> instructions {};
+
+public slots:
+    void reload();
 };

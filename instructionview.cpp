@@ -11,7 +11,7 @@ InstructionView::InstructionView(Mcu* mcu, QWidget *parent)
     this->setSelectionBehavior(QAbstractItemView::SelectRows);
     this->setSelectionMode(QAbstractItemView::SingleSelection);
     this->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    this->setModel(new DisassemblyModel(mcu->disassemble(), this));
+    this->setModel(new DisassemblyModel(mcu, this));
 
     this->horizontalHeader()->setStretchLastSection(true);
 
@@ -27,4 +27,9 @@ void InstructionView::update() {
             this->selectRow(i);
         }
     }
+    this->model()->dataChanged({}, {});
+}
+
+void InstructionView::reload() {
+    dynamic_cast<DisassemblyModel*>(this->model())->reload();
 }

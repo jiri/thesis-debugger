@@ -17,4 +17,5 @@ signals:
 
 public slots:
     void update();
+    void reload();
 };
