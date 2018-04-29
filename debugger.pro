@@ -28,7 +28,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-        flagwidget.cpp \
         instructionview.cpp \
     disassemblymodel.cpp \
     registerview.cpp \
@@ -40,7 +39,6 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-        flagwidget.h \
         instructionview.h \
     disassemblymodel.h \
     registerview.h \
