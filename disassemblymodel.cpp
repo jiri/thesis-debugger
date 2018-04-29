@@ -1,16 +1,17 @@
 #include "disassemblymodel.h"
 
+#include <QColor>
 #include <QFontDatabase>
 
-DisassemblyModel::DisassemblyModel(Mcu* mcu, QObject* parent)
+#include "mcustate.h"
+
+DisassemblyModel::DisassemblyModel(QObject *parent)
     : QAbstractTableModel(parent)
-    , mcu(mcu)
-    , instructions(mcu->disassemble())
 { }
 
 int DisassemblyModel::rowCount(const QModelIndex& parent) const {
     Q_UNUSED(parent);
-    return this->instructions.size();
+    return McuState::instance().disassembly.size();
 }
 
 int DisassemblyModel::columnCount(const QModelIndex& parent) const {
@@ -20,7 +21,7 @@ int DisassemblyModel::columnCount(const QModelIndex& parent) const {
 
 QVariant DisassemblyModel::data(const QModelIndex &index, int role) const {
     if (role == Qt::DisplayRole) {
-        auto& instruction = this->instructions[index.row()];
+        auto& instruction = McuState::instance().disassembly[index.row()];
 
         switch(index.column()) {
         case 0:
@@ -36,6 +37,17 @@ QVariant DisassemblyModel::data(const QModelIndex &index, int role) const {
             return { instruction.print.c_str() };
         }
         return {};
+    }
+
+    if (role == Qt::BackgroundColorRole) {
+        if (McuState::instance().disassembly[index.row()].position == McuState::instance().mcu.pc) {
+            return QColor(0xAA, 0xAA, 0xFF);
+        }
+
+        auto position = McuState::instance().disassembly[index.row()].position;
+        if (McuState::instance().breakpoints.find(position) != McuState::instance().breakpoints.end()) {
+            return QColor(0xFF, 0xAA, 0xAA);
+        }
     }
 
     if (role == Qt::FontRole) {
@@ -69,8 +81,4 @@ QVariant DisassemblyModel::headerData(int section, Qt::Orientation orientation, 
     }
 
     return {};
-}
-
-void DisassemblyModel::reload() {
-    this->instructions = this->mcu->disassemble();
 }

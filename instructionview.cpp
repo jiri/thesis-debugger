@@ -3,15 +3,16 @@
 #include <QHeaderView>
 
 #include "disassemblymodel.h"
+#include "mcustate.h"
 
-InstructionView::InstructionView(Mcu* mcu, QWidget *parent)
+InstructionView::InstructionView(QWidget *parent)
     : QTableView(parent)
-    , mcu(mcu)
 {
     this->setSelectionBehavior(QAbstractItemView::SelectRows);
-    this->setSelectionMode(QAbstractItemView::SingleSelection);
+    this->setSelectionMode(QAbstractItemView::NoSelection);
     this->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    this->setModel(new DisassemblyModel(mcu, this));
+
+    this->setModel(new DisassemblyModel);
 
     this->horizontalHeader()->setStretchLastSection(true);
 
@@ -21,15 +22,11 @@ InstructionView::InstructionView(Mcu* mcu, QWidget *parent)
 }
 
 void InstructionView::update() {
-    auto disassembly = this->mcu->disassemble();
-    for (size_t i = 0; i < disassembly.size(); i++) {
-        if (disassembly[i].position == this->mcu->pc) {
-            this->selectRow(i);
+    for (size_t i = 0; i < McuState::instance().disassembly.size(); i++) {
+        if (McuState::instance().disassembly[i].position == McuState::instance().mcu.pc) {
+            this->selectRow(i); // Workaround for broken this->scrollTo
         }
     }
-    this->model()->dataChanged({}, {});
-}
 
-void InstructionView::reload() {
-    dynamic_cast<DisassemblyModel*>(this->model())->reload();
+    this->model()->dataChanged({}, {});
 }

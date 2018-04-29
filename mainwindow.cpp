@@ -10,17 +10,14 @@
 #include <QFile>
 #include <QFileDialog>
 
+#include <Mcu.hpp>
+
+#include "mcustate.h"
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
     this->resize(800, 600);
-
-    /* Mcu setup */
-    for (auto& inst : this->mcu.disassemble()) {
-        if (inst.binary[0] == 0x03) {
-            this->breakpoints.insert(inst.position);
-        }
-    }
 
     /* Toolbar */
     QToolBar* toolBar = new QToolBar;
@@ -40,7 +37,7 @@ MainWindow::MainWindow(QWidget* parent)
     stepAction->setStatusTip("Do a step on the Mcu");
     toolBar->addAction(stepAction);
 
-    connect(stepAction, &QAction::triggered, this, &MainWindow::step);
+    connect(stepAction, &QAction::triggered, &McuState::instance(), &McuState::step);
 
     /* Step action */
     QAction* runAction = new QAction { QIcon::fromTheme("media-playback-start"), "&Run", this };
@@ -48,7 +45,7 @@ MainWindow::MainWindow(QWidget* parent)
     runAction->setStatusTip("Run the program");
     toolBar->addAction(runAction);
 
-    connect(runAction, &QAction::triggered, [this] { this->timer->start(); });
+    connect(runAction, &QAction::triggered, &McuState::instance(), &McuState::run);
 
     this->addToolBar(Qt::TopToolBarArea, toolBar);
 
@@ -56,9 +53,15 @@ MainWindow::MainWindow(QWidget* parent)
     QWidget* centralWidget = new QWidget;
     this->setCentralWidget(centralWidget);
 
-    this->instructionView = new InstructionView(&this->mcu);
-    this->registerView = new RegisterView(&this->mcu);
-    this->memoryView = new MemoryView(&this->mcu);
+    this->instructionView = new InstructionView(this);
+    connect(&McuState::instance(), &McuState::stateChanged, this->instructionView, &InstructionView::update);
+    connect(this->instructionView, &InstructionView::doubleClicked, &McuState::instance(), &McuState::toggleBreakpoint);
+
+    this->registerView = new RegisterView(this);
+    connect(&McuState::instance(), &McuState::stateChanged, this->registerView, &RegisterView::update);
+
+    this->memoryView = new MemoryView(this);
+    connect(&McuState::instance(), &McuState::stateChanged, this->memoryView, &MemoryView::update);
 
     QVBoxLayout* layout = new QVBoxLayout(centralWidget);
 
@@ -72,33 +75,10 @@ MainWindow::MainWindow(QWidget* parent)
     layout->addLayout(layout2);
 
     centralWidget->setLayout(layout);
-
-    /* 60fps Timer */
-    this->timer = new QTimer;
-    this->timer->setInterval(16);
-//    this->timer->start();
-
-    connect(this->timer, &QTimer::timeout, [this]() {
-        // Run at 16Mhz
-        for (int i = 0; i < 16000000 / 60; i++) {
-            if (this->breakpoints.find(this->mcu.pc) != this->breakpoints.end()) {
-                this->timer->stop();
-                break;
-            }
-            this->mcu.step();
-        }
-
-        this->update();
-    });
 }
 
 MainWindow::~MainWindow()
 { }
-
-void MainWindow::step() {
-    this->mcu.step();
-    this->update();
-}
 
 void MainWindow::update() {
     this->instructionView->update();
@@ -113,21 +93,6 @@ void MainWindow::open() {
         return;
     }
 
-    QByteArray binary = file.readAll();
-
-    this->mcu.load_program({ binary.begin(), binary.end() });
-    this->reset();
-    for (auto& inst : this->mcu.disassemble()) {
-        if (inst.binary[0] == 0x03) {
-            this->breakpoints.insert(inst.position);
-        }
-    }
-    this->update();
-}
-
-void MainWindow::reset() {
-//    this->mcu->reset();
-
-    this->instructionView->reload();
+    McuState::instance().load(file.readAll());
     this->update();
 }

@@ -8,10 +8,7 @@ class MemoryView : public QTableView
 {
     Q_OBJECT
 public:
-    MemoryView(Mcu* mcu, QWidget* parent = nullptr);
-
-private:
-    Mcu* mcu = nullptr;
+    MemoryView(QWidget* parent = nullptr);
 
 public slots:
     void update();

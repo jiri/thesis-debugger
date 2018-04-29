@@ -2,14 +2,15 @@
 
 #include <QFontDatabase>
 
-RegisterModel::RegisterModel(Mcu* mcu, QObject* parent)
+#include "mcustate.h"
+
+RegisterModel::RegisterModel(QObject* parent)
     : QAbstractTableModel(parent)
-    , mcu(mcu)
 { }
 
 int RegisterModel::rowCount(const QModelIndex& parent) const {
     Q_UNUSED(parent);
-    return this->mcu->registers.size();
+    return McuState::instance().mcu.registers.size();
 }
 
 int RegisterModel::columnCount(const QModelIndex& parent) const {
@@ -19,10 +20,10 @@ int RegisterModel::columnCount(const QModelIndex& parent) const {
 
 QVariant RegisterModel::data(const QModelIndex& index, int role) const {
     Q_ASSERT(index.column() == 0);
-    Q_ASSERT(index.column() < this->mcu->registers.size());
+    Q_ASSERT(index.column() < McuState::instance().mcu.registers.size());
 
     if (role == Qt::DisplayRole) {
-        return { QString("%1").arg(this->mcu->registers[index.row()], 2, 16, QChar('0')).toUpper() };
+        return { QString("%1").arg(McuState::instance().mcu.registers[index.row()], 2, 16, QChar('0')).toUpper() };
     }
 
     if (role == Qt::FontRole) {

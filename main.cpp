@@ -1,6 +1,7 @@
 #include <QApplication>
 
 #include "mainwindow.h"
+#include "mcustate.h"
 
 int main(int argc, char *argv[])
 {

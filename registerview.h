@@ -8,9 +8,7 @@ class RegisterView : public QTableView
 {
     Q_OBJECT
 public:
-    explicit RegisterView(Mcu* mcu, QWidget* parent = nullptr);
-
-signals:
+    explicit RegisterView(QWidget* parent = nullptr);
 
 public slots:
     void update();

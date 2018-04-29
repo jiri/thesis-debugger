@@ -2,6 +2,12 @@
 
 #include <QFontDatabase>
 
+#include "mcustate.h"
+
+MemoryModel::MemoryModel(QObject *parent)
+    : QAbstractTableModel(parent)
+{ }
+
 int MemoryModel::rowCount(const QModelIndex& parent) const {
     Q_UNUSED(parent);
     return 0x1000;
@@ -17,12 +23,12 @@ QVariant MemoryModel::data(const QModelIndex& index, int role) const {
         if (index.column() == 16) {
             QString ret;
             for (u16 i = 0; i < 0x10; i++) {
-                char chr = this->mcu->memory[index.row() * 0x10 + i];
+                char chr = McuState::instance().mcu.memory[index.row() * 0x10 + i];
                 ret.append(isprint(chr) ? chr : '.');
             }
             return ret;
         }
-        auto byte = this->mcu->memory[index.row() * 0x10 + index.column()];
+        auto byte = McuState::instance().mcu.memory[index.row() * 0x10 + index.column()];
         return { QString("%1").arg(byte, 2, 16, QChar('0')).toUpper() };
     }
 

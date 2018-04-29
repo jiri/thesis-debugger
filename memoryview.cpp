@@ -4,11 +4,10 @@
 
 #include "memorymodel.h"
 
-MemoryView::MemoryView(Mcu* mcu, QWidget* parent)
+MemoryView::MemoryView(QWidget* parent)
     : QTableView(parent)
-    , mcu(mcu)
 {
-    this->setModel(new MemoryModel(mcu));
+    this->setModel(new MemoryModel);
 
     this->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     this->horizontalHeader()->setDefaultSectionSize(32);

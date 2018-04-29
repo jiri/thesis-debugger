@@ -4,10 +4,10 @@
 
 #include "registermodel.h"
 
-RegisterView::RegisterView(Mcu* mcu, QWidget* parent)
+RegisterView::RegisterView(QWidget* parent)
     : QTableView(parent)
 {
-    this->setModel(new RegisterModel(mcu));
+    this->setModel(new RegisterModel);
 
     this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     this->verticalHeader()->setDefaultSectionSize(20);
