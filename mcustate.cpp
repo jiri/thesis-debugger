@@ -16,6 +16,7 @@ McuState::McuState(QObject *parent)
                 break;
             }
             this->mcu.step();
+            emit stepped();
         }
 
         emit stateChanged();
@@ -38,6 +39,7 @@ void McuState::load(const QByteArray& binary) {
 
 void McuState::step() {
     this->mcu.step();
+    emit stepped();
     emit stateChanged();
 }
 
@@ -56,6 +58,7 @@ void McuState::reset() {
 
 void McuState::run() {
     this->mcu.step();
+    emit stepped();
     emit stateChanged();
     this->timer->start();
 }

@@ -9,5 +9,6 @@ public:
     explicit InstructionView(QWidget* parent = nullptr);
 
 public slots:
+    void scroll();
     void update();
 };

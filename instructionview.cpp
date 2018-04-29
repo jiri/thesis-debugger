@@ -21,12 +21,14 @@ InstructionView::InstructionView(QWidget *parent)
     this->verticalHeader()->setDefaultSectionSize(20);
 }
 
-void InstructionView::update() {
+void InstructionView::scroll() {
     for (size_t i = 0; i < McuState::instance().disassembly.size(); i++) {
         if (McuState::instance().disassembly[i].position == McuState::instance().mcu.pc) {
             this->selectRow(i); // Workaround for broken this->scrollTo
         }
     }
+}
 
+void InstructionView::update() {
     this->model()->dataChanged({}, {});
 }

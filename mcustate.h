@@ -29,6 +29,7 @@ private:
     QTimer* timer = nullptr;
 
 signals:
+    void stepped();
     void stateChanged();
 
 public slots:
