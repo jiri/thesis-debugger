@@ -15,19 +15,40 @@ MainWindow::MainWindow(QWidget* parent)
 {
     this->resize(800, 600);
 
+    /* Mcu setup */
+    for (auto& inst : this->mcu.disassemble()) {
+        if (inst.binary[0] == 0x03) {
+            this->breakpoints.insert(inst.position);
+        }
+    }
+
     /* Toolbar */
     QToolBar* toolBar = new QToolBar;
     toolBar->setMovable(false);
 
     /* Open action */
-    QAction *openAction = new QAction { QIcon::fromTheme("document-open"), "&Open...", this };
+    QAction* openAction = new QAction { QIcon::fromTheme("document-open"), "&Open...", this };
     openAction->setShortcuts(QKeySequence::Open);
-    openAction->setStatusTip(tr("Load a binary"));
+    openAction->setStatusTip("Load a binary");
+    toolBar->addAction(openAction);
 
     connect(openAction, &QAction::triggered, this, &MainWindow::open);
 
-//    fileMenu->addAction(openAct);
-    toolBar->addAction(openAction);
+    /* Step action */
+    QAction* stepAction = new QAction { QIcon::fromTheme("go-down"), "&Step", this };
+    stepAction->setShortcut(QKeySequence("F9"));
+    stepAction->setStatusTip("Do a step on the Mcu");
+    toolBar->addAction(stepAction);
+
+    connect(stepAction, &QAction::triggered, this, &MainWindow::step);
+
+    /* Step action */
+    QAction* runAction = new QAction { QIcon::fromTheme("media-playback-start"), "&Run", this };
+    runAction->setShortcut(QKeySequence("F5"));
+    runAction->setStatusTip("Run the program");
+    toolBar->addAction(runAction);
+
+    connect(runAction, &QAction::triggered, [this] { this->timer->start(); });
 
     this->addToolBar(Qt::TopToolBarArea, toolBar);
 
@@ -55,22 +76,19 @@ MainWindow::MainWindow(QWidget* parent)
     /* 60fps Timer */
     this->timer = new QTimer;
     this->timer->setInterval(16);
-    this->timer->start();
+//    this->timer->start();
 
     connect(this->timer, &QTimer::timeout, [this]() {
         // Run at 16Mhz
-        for (int i = 0; i < 266667; i++) {
+        for (int i = 0; i < 16000000 / 60; i++) {
+            if (this->breakpoints.find(this->mcu.pc) != this->breakpoints.end()) {
+                this->timer->stop();
+                break;
+            }
             this->mcu.step();
         }
 
-        this->instructionView->update();
-        this->registerView->update();
-        this->memoryView->update();
-
-        if (this->mcu.stopped) {
-            this->running = false;
-            this->timer->stop();
-        }
+        this->update();
     });
 }
 
@@ -96,7 +114,19 @@ void MainWindow::open() {
     }
 
     QByteArray binary = file.readAll();
+
     this->mcu.load_program({ binary.begin(), binary.end() });
+    this->reset();
+    for (auto& inst : this->mcu.disassemble()) {
+        if (inst.binary[0] == 0x03) {
+            this->breakpoints.insert(inst.position);
+        }
+    }
+    this->update();
+}
+
+void MainWindow::reset() {
+//    this->mcu->reset();
 
     this->instructionView->reload();
     this->update();

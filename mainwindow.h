@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include <QMainWindow>
 #include <QTimer>
 
@@ -22,7 +24,7 @@ private:
     Mcu mcu;
     bool running = false;
     bool breaked = false;
-    std::vector<u16> breakpoints;
+    std::set<u16> breakpoints;
 
     /* Qt */
     InstructionView* instructionView;
@@ -35,4 +37,5 @@ private slots:
     void step();
     void update();
     void open();
+    void reset();
 };
