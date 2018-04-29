@@ -1,6 +1,8 @@
 #include "instructionview.h"
 
+#include <QContextMenuEvent>
 #include <QHeaderView>
+#include <QMenu>
 
 #include "disassemblymodel.h"
 #include "mcustate.h"
@@ -19,6 +21,20 @@ InstructionView::InstructionView(QWidget *parent)
     this->verticalHeader()->hide();
     this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     this->verticalHeader()->setDefaultSectionSize(20);
+}
+
+void InstructionView::contextMenuEvent(QContextMenuEvent* event) {
+    QModelIndex index = indexAt(event->pos());
+    if (index.isValid()) {
+        const auto& instruction = McuState::instance().disassembly[index.row()];
+        QMenu menu;
+
+        menu.addAction(QString("Jump to 0x%1").arg(instruction.position, 4, 15, QChar('0')), this, [instruction] {
+            McuState::instance().mcu.pc = instruction.position;
+        });
+
+        menu.exec(event->globalPos());
+    }
 }
 
 void InstructionView::scroll() {

@@ -8,6 +8,9 @@ class InstructionView : public QTableView
 public:
     explicit InstructionView(QWidget* parent = nullptr);
 
+private:
+    void contextMenuEvent(QContextMenuEvent* event) override;
+
 public slots:
     void scroll();
     void update();
