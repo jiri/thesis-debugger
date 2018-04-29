@@ -8,6 +8,7 @@
 #include "instructionview.h"
 #include "registerview.h"
 #include "memoryview.h"
+#include "flagview.h"
 
 class MainWindow : public QMainWindow
 {
@@ -18,9 +19,10 @@ public:
     ~MainWindow();
 
 private:
-    InstructionView* instructionView;
-    RegisterView* registerView;
-    MemoryView* memoryView;
+    InstructionView* instructionView = nullptr;
+    RegisterView* registerView = nullptr;
+    FlagView* flagView = nullptr;
+    MemoryView* memoryView = nullptr;
 
 private slots:
     void update();

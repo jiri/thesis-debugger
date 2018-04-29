@@ -35,7 +35,8 @@ SOURCES += \
     registermodel.cpp \
     memoryview.cpp \
     memorymodel.cpp \
-    mcustate.cpp
+    mcustate.cpp \
+    flagview.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -46,7 +47,8 @@ HEADERS += \
     registermodel.h \
     memoryview.h \
     memorymodel.h \
-    mcustate.h
+    mcustate.h \
+    flagview.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../emulator/cmake-build-debug/release/ -lemulator
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../emulator/cmake-build-debug/debug/ -lemulator

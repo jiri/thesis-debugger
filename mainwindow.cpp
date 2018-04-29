@@ -60,6 +60,9 @@ MainWindow::MainWindow(QWidget* parent)
     this->registerView = new RegisterView(this);
     connect(&McuState::instance(), &McuState::stateChanged, this->registerView, &RegisterView::update);
 
+    this->flagView = new FlagView(this);
+    connect(&McuState::instance(), &McuState::stateChanged, this->flagView, &FlagView::update);
+
     this->memoryView = new MemoryView(this);
     connect(&McuState::instance(), &McuState::stateChanged, this->memoryView, &MemoryView::update);
 
@@ -68,6 +71,7 @@ MainWindow::MainWindow(QWidget* parent)
     QHBoxLayout* layout1 = new QHBoxLayout;
     layout1->addWidget(this->instructionView);
     layout1->addWidget(this->registerView);
+    layout1->addWidget(this->flagView);
     layout->addLayout(layout1);
 
     QHBoxLayout* layout2 = new QHBoxLayout;
