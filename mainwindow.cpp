@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget* parent)
     QVBoxLayout* layout = new QVBoxLayout(centralWidget);
 
     QHBoxLayout* layout1 = new QHBoxLayout;
-    layout1->addWidget(this->instructionView);
+    layout1->addWidget(this->instructionView, 1);
     layout1->addWidget(this->registerView);
     layout1->addWidget(this->flagView);
     layout->addLayout(layout1);

@@ -13,6 +13,8 @@ RegisterView::RegisterView(QWidget* parent)
 
     this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     this->verticalHeader()->setDefaultSectionSize(20);
+
+    this->setMaximumWidth(120);
 }
 
 void RegisterView::update() {
