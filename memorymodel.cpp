@@ -45,6 +45,15 @@ QVariant MemoryModel::data(const QModelIndex& index, int role) const {
     return {};
 }
 
+bool MemoryModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+    if (role == Qt::EditRole) {
+        McuState::instance().mcu.memory[index.row() * 0x10 + index.column()] = value.toString().toUShort(nullptr, 16);
+        emit dataChanged(index, index);
+        return true;
+    }
+    return false;
+}
+
 QVariant MemoryModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (role == Qt::DisplayRole) {
         if (orientation == Qt::Horizontal) {
@@ -68,4 +77,12 @@ QVariant MemoryModel::headerData(int section, Qt::Orientation orientation, int r
     }
 
     return {};
+}
+
+Qt::ItemFlags MemoryModel::flags(const QModelIndex& index) const {
+    auto flags = QAbstractTableModel::flags(index);
+    if (index.column() < 16) {
+        flags |= Qt::ItemIsEditable;
+    }
+    return flags;
 }

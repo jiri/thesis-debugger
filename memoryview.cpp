@@ -9,6 +9,8 @@ MemoryView::MemoryView(QWidget* parent)
 {
     this->setModel(new MemoryModel);
 
+    this->setSelectionMode(QAbstractItemView::SingleSelection);
+
     this->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     this->horizontalHeader()->setDefaultSectionSize(32);
     this->horizontalHeader()->setStretchLastSection(true);
