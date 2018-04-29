@@ -32,7 +32,20 @@ QVariant RegisterModel::data(const QModelIndex& index, int role) const {
         return font;
     }
 
+    if (role == Qt::EditRole) {
+        return QVariant::String;
+    }
+
     return {};
+}
+
+bool RegisterModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+    if (role == Qt::EditRole) {
+        McuState::instance().mcu.registers[index.row()] = value.toString().toUShort(nullptr, 16);
+        emit dataChanged(index, index);
+        return true;
+    }
+    return false;
 }
 
 QVariant RegisterModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -48,4 +61,8 @@ QVariant RegisterModel::headerData(int section, Qt::Orientation orientation, int
     }
 
     return {};
+}
+
+Qt::ItemFlags RegisterModel::flags(const QModelIndex& index) const {
+    return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
 }

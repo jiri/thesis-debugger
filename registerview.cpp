@@ -9,6 +9,8 @@ RegisterView::RegisterView(QWidget* parent)
 {
     this->setModel(new RegisterModel);
 
+    this->setSelectionMode(QAbstractItemView::SingleSelection);
+
     this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     this->verticalHeader()->setDefaultSectionSize(20);
 }
