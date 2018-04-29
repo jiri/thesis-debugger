@@ -5,6 +5,10 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QToolBar>
+#include <QAction>
+#include <QFile>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -19,6 +23,22 @@ MainWindow::MainWindow(QWidget* parent)
     ifs.read(reinterpret_cast<char *>(program.data()), size);
 
     this->mcu.load_program(program);
+
+    /* Toolbar */
+    QToolBar* toolBar = new QToolBar;
+    toolBar->setMovable(false);
+
+    /* Open action */
+    QAction *openAction = new QAction { QIcon::fromTheme("document-open"), "&Open...", this };
+    openAction->setShortcuts(QKeySequence::Open);
+    openAction->setStatusTip(tr("Load a binary"));
+
+    connect(openAction, &QAction::triggered, this, &MainWindow::open);
+
+//    fileMenu->addAction(openAct);
+    toolBar->addAction(openAction);
+
+    this->addToolBar(Qt::TopToolBarArea, toolBar);
 
     /* Setup */
     QWidget* centralWidget = new QWidget;
@@ -41,18 +61,52 @@ MainWindow::MainWindow(QWidget* parent)
 
     centralWidget->setLayout(layout);
 
-    /* Timer */
+    /* 60fps Timer */
     this->timer = new QTimer;
-    this->timer->setInterval(1000);
+    this->timer->setInterval(16);
     this->timer->start();
 
     connect(this->timer, &QTimer::timeout, [this]() {
-        this->mcu.step();
+        // Run at 16Mhz
+        for (int i = 0; i < 266667; i++) {
+            this->mcu.step();
+        }
+
         this->instructionView->update();
         this->registerView->update();
         this->memoryView->update();
+
+        if (this->mcu.stopped) {
+            this->running = false;
+            this->timer->stop();
+        }
     });
 }
 
 MainWindow::~MainWindow()
 { }
+
+void MainWindow::step() {
+    this->mcu.step();
+    this->update();
+}
+
+void MainWindow::update() {
+    this->instructionView->update();
+    this->registerView->update();
+    this->memoryView->update();
+}
+
+void MainWindow::open() {
+    QFile file { QFileDialog::getOpenFileName(this) };
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        return;
+    }
+
+    QByteArray binary = file.readAll();
+    this->mcu.load_program({ binary.begin(), binary.end() });
+
+    this->instructionView->reload();
+    this->update();
+}

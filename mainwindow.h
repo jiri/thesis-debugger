@@ -18,10 +18,21 @@ public:
     ~MainWindow();
 
 private:
+    /* Mcu */
     Mcu mcu;
+    bool running = false;
+    bool breaked = false;
+    std::vector<u16> breakpoints;
 
+    /* Qt */
     InstructionView* instructionView;
     RegisterView* registerView;
     MemoryView* memoryView;
+
     QTimer* timer;
+
+private slots:
+    void step();
+    void update();
+    void open();
 };
