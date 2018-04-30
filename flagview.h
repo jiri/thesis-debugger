@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QWidget>
+#include <QGroupBox>
 #include <QCheckBox>
 
-class FlagView : public QWidget {
+class FlagView : public QGroupBox {
     Q_OBJECT
 public:
     explicit FlagView(QWidget *parent = nullptr);

@@ -5,7 +5,7 @@
 #include "mcustate.h"
 
 FlagView::FlagView(QWidget *parent)
-    : QWidget(parent)
+    : QGroupBox("Flags", parent)
 {
     QVBoxLayout* layout = new QVBoxLayout;
 
