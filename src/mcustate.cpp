@@ -9,6 +9,15 @@
 
 Q_GLOBAL_STATIC(McuState, mcuState)
 
+namespace {
+    void show_error(const illegal_opcode_error& e) {
+        auto* error = new QErrorMessage;
+        error->setWindowTitle("Error");
+        error->setAttribute(Qt::WA_DeleteOnClose);
+        error->showMessage(e.what());
+    }
+}
+
 McuState::McuState(QObject *parent)
     : QObject(parent)
 {
@@ -24,13 +33,18 @@ McuState::McuState(QObject *parent)
     connect(this->timer, &QTimer::timeout, [this] {
         this->mcu.interrupts.vblank = true;
 
-        // Run at 16Mhz
-        for (int i = 0; i < 16000000 / 60; i++) {
-            if (this->breakpoints.find(this->mcu.pc) != this->breakpoints.end()) {
-                this->timer->stop();
-                break;
+        try {
+            // Run at 16Mhz
+            for (int i = 0; i < 16000000 / 60; i++) {
+                if (this->breakpoints.find(this->mcu.pc) != this->breakpoints.end()) {
+                    this->timer->stop();
+                    break;
+                }
+                this->mcu.step();
             }
-            this->mcu.step();
+        }
+        catch (illegal_opcode_error& e) {
+            show_error(e);
         }
 
         emit stepped();
@@ -116,9 +130,14 @@ void McuState::loadSymbols(const QByteArray& json) {
 }
 
 void McuState::step() {
-    this->mcu.step();
-    emit stepped();
-    emit stateChanged();
+    try {
+        this->mcu.step();
+        emit stepped();
+        emit stateChanged();
+    }
+    catch (illegal_opcode_error& e) {
+        show_error(e);
+    }
 }
 
 void McuState::reset() {
@@ -138,9 +157,7 @@ void McuState::reset() {
 }
 
 void McuState::run() {
-    this->mcu.step();
-    emit stepped();
-    emit stateChanged();
+    this->step();
     this->timer->start();
 }
 
