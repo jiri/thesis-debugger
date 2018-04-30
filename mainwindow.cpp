@@ -18,6 +18,7 @@
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
+    this->setWindowTitle("Debugger");
     this->resize(800, 600);
 
     /* Toolbar */
