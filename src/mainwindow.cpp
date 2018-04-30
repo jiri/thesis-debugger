@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget* parent)
 
     toolBar->addAction(QIcon::fromTheme("utilities-terminal"), "&Console", &McuState::instance(), &McuState::showConsole);
 
+    toolBar->addAction(QIcon::fromTheme("utilities-terminal"), "&Player", &McuState::instance(), &McuState::showPlayer);
+
     this->addToolBar(Qt::TopToolBarArea, toolBar);
 
     /* Setup views */

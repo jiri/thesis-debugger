@@ -1,3 +1,4 @@
+#include <Mcu.hpp>
 #include "mcustate.h"
 
 Q_GLOBAL_STATIC(McuState, mcuState)
@@ -8,10 +9,15 @@ McuState::McuState(QObject *parent)
     this->serialConsole = new SerialConsole;
     this->serialConsole->setWindowTitle("Serial console");
 
+    this->playerView = new PlayerView;
+    connect(this, &McuState::stateChanged, this->playerView, &PlayerView::update);
+
     this->timer = new QTimer;
     this->timer->setInterval(16);
 
     connect(this->timer, &QTimer::timeout, [this] {
+        this->mcu.interrupts.vblank = true;
+
         // Run at 16Mhz
         for (int i = 0; i < 16000000 / 60; i++) {
             if (this->breakpoints.find(this->mcu.pc) != this->breakpoints.end()) {
@@ -26,7 +32,7 @@ McuState::McuState(QObject *parent)
     });
 
     this->disassembly = this->mcu.disassemble();
-    emit stateChanged();
+    emit stepped();
 
     /* I/O handlers */
     mcu.io_handlers[0x10] = IoHandler {
@@ -43,10 +49,19 @@ McuState::McuState(QObject *parent)
                 this->serialConsole->sendChar(chr);
             },
     };
+
+    mcu.io_handlers[0x02] = IoHandler {
+        .get = [this]() -> u8 {
+            auto tmp = this->buttonBuffer;
+            this->buttonBuffer = 0x00;
+            return tmp;
+        },
+    };
 }
 
 McuState::~McuState() {
     delete this->serialConsole;
+    delete this->playerView;
 }
 
 McuState& McuState::instance() {
@@ -117,4 +132,13 @@ void McuState::serialSend(QString line) {
 
 void McuState::showConsole() {
     this->serialConsole->show();
+}
+
+void McuState::showPlayer() {
+    this->playerView->show();
+}
+
+void McuState::pressButton(u8 mask) {
+    this->mcu.interrupts.button = true;
+    this->buttonBuffer |= mask;
 }

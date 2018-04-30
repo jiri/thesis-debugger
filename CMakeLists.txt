@@ -29,6 +29,8 @@ set(SOURCE_FILES
         src/registerview.cpp
         src/serialconsole.hpp
         src/serialconsole.cpp
+        src/playerview.hpp
+        src/playerview.cpp
 )
 
 add_subdirectory(lib/emulator)

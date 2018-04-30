@@ -11,6 +11,7 @@
 #include <Mcu.hpp>
 
 #include "serialconsole.hpp"
+#include "playerview.hpp"
 
 class McuState : public QObject
 {
@@ -32,6 +33,9 @@ public:
     QQueue<u8> serialQueue = {};
     SerialConsole* serialConsole = nullptr;
 
+    u8 buttonBuffer = 0;
+    PlayerView* playerView = nullptr;
+
 private:
     QTimer* timer = nullptr;
 
@@ -49,4 +53,6 @@ public slots:
     void toggleBreakpoint(u16 position);
     void serialSend(QString line);
     void showConsole();
+    void showPlayer();
+    void pressButton(u8 mask);
 };
