@@ -33,7 +33,7 @@ void InstructionView::contextMenuEvent(QContextMenuEvent* event) {
             McuState::instance().toggleBreakpoint(instruction.position);
         });
 
-        menu.addAction(QString("Jump to 0x%1").arg(instruction.position, 4, 15, QChar('0')), this, [instruction] {
+        menu.addAction(QString("Jump to 0x%1").arg(instruction.position, 4, 16, QChar('0')), this, [instruction] {
             McuState::instance().mcu.pc = instruction.position;
         });
 
