@@ -25,4 +25,5 @@ private:
 private slots:
     void update();
     void open();
+    void openSymfile();
 };

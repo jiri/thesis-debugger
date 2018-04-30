@@ -1,4 +1,10 @@
 #include <Mcu.hpp>
+
+#include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QErrorMessage>
+
 #include "mcustate.h"
 
 Q_GLOBAL_STATIC(McuState, mcuState)
@@ -75,6 +81,36 @@ void McuState::load(const QByteArray& binary) {
     emit stateChanged();
 }
 
+void McuState::loadSymbols(const QByteArray& json) {
+    McuState::instance().labels = {};
+    QJsonParseError error {};
+    QJsonObject d = QJsonDocument::fromJson(json, &error).object();
+
+    if (error.error != QJsonParseError::NoError) {
+        auto* dialog = new QErrorMessage;
+        dialog->setWindowTitle("Json Error");
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->showMessage(error.errorString());
+        return;
+    }
+
+    for (const auto& key : d.keys()) {
+        auto position = d[key].toInt();
+
+        if (key.contains('.')) {
+            auto parts = key.split('.');
+            parts[0] = "";
+
+            if (this->labels.find(position) == this->labels.end() || this->labels[position].startsWith(QChar('.'))) {
+                this->labels[position] = parts.join('.');
+            }
+        }
+        else {
+            this->labels[position] = key;
+        }
+    }
+}
+
 void McuState::step() {
     this->mcu.step();
     emit stepped();
@@ -84,7 +120,9 @@ void McuState::step() {
 void McuState::reset() {
     this->mcu.reset();
 
+    this->labels = {};
     this->breakpoints = {};
+
     for (auto& inst : this->mcu.disassemble()) {
         if (inst.binary[0] == 0x03) {
             this->breakpoints.insert(inst.position);

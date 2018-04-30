@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget* parent)
     toolBar->addAction(QIcon::fromTheme("document-open"), "&Open...", this, &MainWindow::open);
     toolBar->actions().last()->setShortcuts(QKeySequence::Open);
 
+    toolBar->addAction(QIcon::fromTheme("document-open"), "&Load symfile...", this, &MainWindow::openSymfile);
+
     toolBar->addAction(QIcon::fromTheme("view-refresh"), "&Reset", &McuState::instance(), &McuState::reset);
     toolBar->actions().last()->setShortcut(QKeySequence("F1"));
 
@@ -95,5 +97,16 @@ void MainWindow::open() {
     }
 
     McuState::instance().load(file.readAll());
+    this->update();
+}
+
+void MainWindow::openSymfile() {
+    QFile file { QFileDialog::getOpenFileName(this) };
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        return;
+    }
+
+    McuState::instance().loadSymbols(file.readAll());
     this->update();
 }

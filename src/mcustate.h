@@ -25,6 +25,7 @@ public:
     bool running = false;
     bool breaked = false;
 
+    std::unordered_map<u16, QString> labels;
     std::vector<DisassembledInstruction> disassembly = {};
     std::set<u16> breakpoints = {};
 
@@ -45,6 +46,7 @@ signals:
 
 public slots:
     void load(const QByteArray& binary);
+    void loadSymbols(const QByteArray& json);
     void step();
     void reset();
     void run();

@@ -18,7 +18,6 @@ InstructionView::InstructionView(QWidget *parent)
 
     this->horizontalHeader()->setStretchLastSection(true);
 
-    this->verticalHeader()->hide();
     this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     this->verticalHeader()->setDefaultSectionSize(20);
 }
@@ -51,4 +50,5 @@ void InstructionView::scroll() {
 
 void InstructionView::update() {
     this->model()->dataChanged({}, {});
+    this->model()->headerDataChanged(Qt::Vertical, {}, {});
 }
