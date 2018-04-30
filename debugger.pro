@@ -26,27 +26,27 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-        instructionview.cpp \
-    disassemblymodel.cpp \
-    registerview.cpp \
-    registermodel.cpp \
-    memoryview.cpp \
-    memorymodel.cpp \
-    mcustate.cpp \
-    flagview.cpp
+        src/main.cpp \
+        src/mainwindow.cpp \
+        src/instructionview.cpp \
+        src/disassemblymodel.cpp \
+        src/registerview.cpp \
+        src/registermodel.cpp \
+        src/memoryview.cpp \
+        src/memorymodel.cpp \
+        src/mcustate.cpp \
+        src/flagview.cpp
 
 HEADERS += \
-        mainwindow.h \
-        instructionview.h \
-    disassemblymodel.h \
-    registerview.h \
-    registermodel.h \
-    memoryview.h \
-    memorymodel.h \
-    mcustate.h \
-    flagview.h
+        src/mainwindow.h \
+        src/instructionview.h \
+        src/disassemblymodel.h \
+        src/registerview.h \
+        src/registermodel.h \
+        src/memoryview.h \
+        src/memorymodel.h \
+        src/mcustate.h \
+        src/flagview.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../emulator/cmake-build-debug/release/ -lemulator
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../emulator/cmake-build-debug/debug/ -lemulator
