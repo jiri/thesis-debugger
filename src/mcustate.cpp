@@ -75,7 +75,11 @@ McuState& McuState::instance() {
 }
 
 void McuState::load(const QByteArray& binary) {
-    this->mcu.load_program({ binary.begin(), binary.end() });
+    std::vector<u8> program(0x10000);
+    for (size_t i = 0; i < std::min((size_t)binary.size(), program.size()); i++) {
+        program[i] = binary.at(i);
+    }
+    this->mcu.load_program(program);
     this->disassembly = this->mcu.disassemble();
     this->reset();
     emit stateChanged();
