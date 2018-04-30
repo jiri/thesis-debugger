@@ -9,6 +9,7 @@
 #include <QAction>
 #include <QFile>
 #include <QFileDialog>
+#include <QSplitter>
 
 #include <Mcu.hpp>
 
@@ -49,10 +50,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     this->addToolBar(Qt::TopToolBarArea, toolBar);
 
-    /* Setup */
-    QWidget* centralWidget = new QWidget;
-    this->setCentralWidget(centralWidget);
-
+    /* Setup views */
     this->instructionView = new InstructionView(this);
     connect(&McuState::instance(), &McuState::stateChanged, this->instructionView, &InstructionView::update);
     connect(&McuState::instance(), &McuState::stepped, this->instructionView, &InstructionView::scroll);
@@ -67,19 +65,22 @@ MainWindow::MainWindow(QWidget* parent)
     this->memoryView = new MemoryView(this);
     connect(&McuState::instance(), &McuState::stateChanged, this->memoryView, &MemoryView::update);
 
-    QVBoxLayout* layout = new QVBoxLayout(centralWidget);
+    /* Setup layout */
+    QSplitter* splitter = new QSplitter(Qt::Vertical);
+    splitter->setHandleWidth(1);
+    this->setCentralWidget(splitter);
 
-    QHBoxLayout* layout1 = new QHBoxLayout;
-    layout1->addWidget(this->instructionView, 1);
-    layout1->addWidget(this->registerView);
-    layout1->addWidget(this->flagView);
-    layout->addLayout(layout1);
+    QWidget* topWidget = new QWidget;
+    topWidget->setLayout(new QHBoxLayout);
+    topWidget->layout()->addWidget(this->instructionView);
+    topWidget->layout()->addWidget(this->registerView);
+    topWidget->layout()->addWidget(this->flagView);
+    splitter->addWidget(topWidget);
 
-    QHBoxLayout* layout2 = new QHBoxLayout;
-    layout2->addWidget(this->memoryView);
-    layout->addLayout(layout2);
-
-    centralWidget->setLayout(layout);
+    QWidget* bottomWidget = new QWidget;
+    bottomWidget->setLayout(new QHBoxLayout);
+    bottomWidget->layout()->addWidget(this->memoryView);
+    splitter->addWidget(bottomWidget);
 }
 
 MainWindow::~MainWindow()
