@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget* parent)
     this->resize(800, 600);
 
     /* Toolbar */
-    QToolBar* toolBar = new QToolBar;
+    auto* toolBar = new QToolBar;
     toolBar->setMovable(false);
 
     toolBar->addAction(QIcon::fromTheme("document-open"), "&Open...", this, &MainWindow::open);
@@ -58,25 +58,24 @@ MainWindow::MainWindow(QWidget* parent)
     connect(&McuState::instance(), &McuState::stateChanged, this->memoryView, &MemoryView::update);
 
     /* Setup layout */
-    QSplitter* splitter = new QSplitter(Qt::Vertical);
+    auto* splitter = new QSplitter(Qt::Vertical);
     splitter->setHandleWidth(1);
     this->setCentralWidget(splitter);
 
-    QWidget* topWidget = new QWidget;
+    auto* topWidget = new QWidget;
     topWidget->setLayout(new QHBoxLayout);
     topWidget->layout()->addWidget(this->instructionView);
     topWidget->layout()->addWidget(this->registerView);
     topWidget->layout()->addWidget(this->flagView);
     splitter->addWidget(topWidget);
 
-    QWidget* bottomWidget = new QWidget;
+    auto* bottomWidget = new QWidget;
     bottomWidget->setLayout(new QHBoxLayout);
     bottomWidget->layout()->addWidget(this->memoryView);
     splitter->addWidget(bottomWidget);
 }
 
-MainWindow::~MainWindow()
-{ }
+MainWindow::~MainWindow() = default;
 
 void MainWindow::update() {
     this->instructionView->update();

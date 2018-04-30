@@ -8,25 +8,25 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt5Widgets)
 
 set(SOURCE_FILES
-  src/disassemblymodel.h
-  src/disassemblymodel.cpp
-  src/flagview.h
-  src/flagview.cpp
-  src/instructionview.h
-  src/instructionview.cpp
-  src/main.cpp
-  src/mainwindow.h
-  src/mainwindow.cpp
-  src/mcustate.h
-  src/mcustate.cpp
-  src/memorymodel.h
-  src/memorymodel.cpp
-  src/memoryview.h
-  src/memoryview.cpp
-  src/registermodel.h
-  src/registermodel.cpp
-  src/registerview.h
-  src/registerview.cpp
+        src/disassemblymodel.h
+        src/disassemblymodel.cpp
+        src/flagview.h
+        src/flagview.cpp
+        src/instructionview.h
+        src/instructionview.cpp
+        src/main.cpp
+        src/mainwindow.h
+        src/mainwindow.cpp
+        src/mcustate.h
+        src/mcustate.cpp
+        src/memorymodel.h
+        src/memorymodel.cpp
+        src/memoryview.h
+        src/memoryview.cpp
+        src/registermodel.h
+        src/registermodel.cpp
+        src/registerview.h
+        src/registerview.cpp
 )
 
 add_subdirectory(lib/emulator)
@@ -39,4 +39,4 @@ target_link_libraries(
         Qt5::Widgets
         fmt
         emulator
-        )
+)
