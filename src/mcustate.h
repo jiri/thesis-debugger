@@ -6,14 +6,18 @@
 #include <QObject>
 #include <QModelIndex>
 #include <QTimer>
+#include <QQueue>
 
 #include <Mcu.hpp>
+
+#include "serialconsole.hpp"
 
 class McuState : public QObject
 {
     Q_OBJECT
 public:
     explicit McuState(QObject *parent = nullptr);
+    ~McuState() override;
 
     Mcu mcu;
 
@@ -24,6 +28,9 @@ public:
     std::set<u16> breakpoints = {};
 
     static McuState& instance();
+
+    QQueue<u8> serialQueue = {};
+    SerialConsole* serialConsole = nullptr;
 
 private:
     QTimer* timer = nullptr;
@@ -40,4 +47,6 @@ public slots:
     void stop();
     void toggleBreakpointIndex(const QModelIndex& index);
     void toggleBreakpoint(u16 position);
+    void serialSend(QString line);
+    void showConsole();
 };

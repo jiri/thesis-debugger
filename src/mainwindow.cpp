@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget* parent)
     toolBar->addAction(QIcon::fromTheme("media-playback-stop"), "&Stop", &McuState::instance(), &McuState::stop);
     toolBar->actions().last()->setShortcut(QKeySequence("F6"));
 
+    toolBar->addAction(QIcon::fromTheme("utilities-terminal"), "&Console", &McuState::instance(), &McuState::showConsole);
+
     this->addToolBar(Qt::TopToolBarArea, toolBar);
 
     /* Setup views */

@@ -5,6 +5,9 @@ Q_GLOBAL_STATIC(McuState, mcuState)
 McuState::McuState(QObject *parent)
     : QObject(parent)
 {
+    this->serialConsole = new SerialConsole;
+    this->serialConsole->setWindowTitle("Serial console");
+
     this->timer = new QTimer;
     this->timer->setInterval(16);
 
@@ -24,6 +27,26 @@ McuState::McuState(QObject *parent)
 
     this->disassembly = this->mcu.disassemble();
     emit stateChanged();
+
+    /* I/O handlers */
+    mcu.io_handlers[0x10] = IoHandler {
+            .get = [this]() -> u8 {
+                if (this->serialQueue.empty()) {
+                    return 0x00;
+                }
+
+                u8 tmp = this->serialQueue.front();
+                this->serialQueue.pop_front();
+                return tmp;
+            },
+            .set = [this](u8 chr) {
+                this->serialConsole->sendChar(chr);
+            },
+    };
+}
+
+McuState::~McuState() {
+    delete this->serialConsole;
 }
 
 McuState& McuState::instance() {
@@ -83,4 +106,15 @@ void McuState::toggleBreakpoint(u16 position) {
     }
 
     emit stateChanged();
+}
+
+void McuState::serialSend(QString line) {
+    for (QChar c : line) {
+        this->serialQueue.append(c.toLatin1());
+    }
+    this->mcu.interrupts.serial = true;
+}
+
+void McuState::showConsole() {
+    this->serialConsole->show();
 }

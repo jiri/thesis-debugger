@@ -27,6 +27,8 @@ set(SOURCE_FILES
         src/registermodel.cpp
         src/registerview.h
         src/registerview.cpp
+        src/serialconsole.hpp
+        src/serialconsole.cpp
 )
 
 add_subdirectory(lib/emulator)
