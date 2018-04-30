@@ -44,19 +44,19 @@ PlayerView::PlayerView(QWidget* parent)
     this->label->setPixmap(QPixmap::fromImage(buffer).scaled(160 * 2, 144 * 2));
     this->label->setFixedSize(160 * 2, 144 * 2);
 
-    this->upButton = new QPushButton("U");
+    this->upButton = new QPushButton("▲");
     connect(this->upButton, &QPushButton::pressed, [this] { McuState::instance().pressButton(1 << 0); });
-    this->downButton = new QPushButton("D");
+    this->downButton = new QPushButton("▼");
     connect(this->downButton, &QPushButton::pressed, [this] { McuState::instance().pressButton(1 << 1); });
-    this->leftButton = new QPushButton("L");
+    this->leftButton = new QPushButton("◀");
     connect(this->leftButton, &QPushButton::pressed, [this] { McuState::instance().pressButton(1 << 2); });
-    this->rightButton = new QPushButton("R");
+    this->rightButton = new QPushButton("▶");
     connect(this->rightButton, &QPushButton::pressed, [this] { McuState::instance().pressButton(1 << 3); });
     this->aButton = new QPushButton("A");
     connect(this->aButton, &QPushButton::pressed, [this] { McuState::instance().pressButton(1 << 4); });
     this->bButton = new QPushButton("B");
     connect(this->bButton, &QPushButton::pressed, [this] { McuState::instance().pressButton(1 << 5); });
-    this->returnButton = new QPushButton(".");
+    this->returnButton = new QPushButton("●");
     connect(this->returnButton, &QPushButton::pressed, [this] { McuState::instance().pressButton(1 << 6); });
 
     auto* layout = new QGridLayout;
