@@ -16,9 +16,9 @@ McuState::McuState(QObject *parent)
                 break;
             }
             this->mcu.step();
-            emit stepped();
         }
 
+        emit stepped();
         emit stateChanged();
     });
 
@@ -53,6 +53,7 @@ void McuState::reset() {
         }
     }
 
+    emit stepped();
     emit stateChanged();
 }
 
@@ -61,6 +62,10 @@ void McuState::run() {
     emit stepped();
     emit stateChanged();
     this->timer->start();
+}
+
+void McuState::stop() {
+    this->timer->stop();
 }
 
 void McuState::toggleBreakpoint(const QModelIndex& index) {

@@ -24,29 +24,20 @@ MainWindow::MainWindow(QWidget* parent)
     QToolBar* toolBar = new QToolBar;
     toolBar->setMovable(false);
 
-    /* Open action */
-    QAction* openAction = new QAction { QIcon::fromTheme("document-open"), "&Open...", this };
-    openAction->setShortcuts(QKeySequence::Open);
-    openAction->setStatusTip("Load a binary");
-    toolBar->addAction(openAction);
+    toolBar->addAction(QIcon::fromTheme("document-open"), "&Open...", this, &MainWindow::open);
+    toolBar->actions().last()->setShortcuts(QKeySequence::Open);
 
-    connect(openAction, &QAction::triggered, this, &MainWindow::open);
+    toolBar->addAction(QIcon::fromTheme("view-refresh"), "&Reset", &McuState::instance(), &McuState::reset);
+    toolBar->actions().last()->setShortcut(QKeySequence("F1"));
 
-    /* Step action */
-    QAction* stepAction = new QAction { QIcon::fromTheme("go-down"), "&Step", this };
-    stepAction->setShortcut(QKeySequence("F9"));
-    stepAction->setStatusTip("Do a step on the Mcu");
-    toolBar->addAction(stepAction);
+    toolBar->addAction(QIcon::fromTheme("go-down"), "&Step", &McuState::instance(), &McuState::step);
+    toolBar->actions().last()->setShortcut(QKeySequence("F9"));
 
-    connect(stepAction, &QAction::triggered, &McuState::instance(), &McuState::step);
+    toolBar->addAction(QIcon::fromTheme("media-playback-start"), "&Run", &McuState::instance(), &McuState::run);
+    toolBar->actions().last()->setShortcut(QKeySequence("F5"));
 
-    /* Step action */
-    QAction* runAction = new QAction { QIcon::fromTheme("media-playback-start"), "&Run", this };
-    runAction->setShortcut(QKeySequence("F5"));
-    runAction->setStatusTip("Run the program");
-    toolBar->addAction(runAction);
-
-    connect(runAction, &QAction::triggered, &McuState::instance(), &McuState::run);
+    toolBar->addAction(QIcon::fromTheme("media-playback-stop"), "&Stop", &McuState::instance(), &McuState::stop);
+    toolBar->actions().last()->setShortcut(QKeySequence("F6"));
 
     this->addToolBar(Qt::TopToolBarArea, toolBar);
 
