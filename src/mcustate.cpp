@@ -51,11 +51,11 @@ McuState::McuState(QObject *parent)
     };
 
     mcu.io_handlers[0x02] = IoHandler {
-        .get = [this]() -> u8 {
-            auto tmp = this->buttonBuffer;
-            this->buttonBuffer = 0x00;
-            return tmp;
-        },
+            .get = [this]() -> u8 {
+                auto tmp = this->buttonBuffer;
+                this->buttonBuffer = 0x00;
+                return tmp;
+            },
     };
 }
 
