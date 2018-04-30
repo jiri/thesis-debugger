@@ -68,8 +68,11 @@ void McuState::stop() {
     this->timer->stop();
 }
 
-void McuState::toggleBreakpoint(const QModelIndex& index) {
-    u16 position = this->disassembly[index.row()].position;
+void McuState::toggleBreakpointIndex(const QModelIndex& index) {
+    this->toggleBreakpoint(this->disassembly[index.row()].position);
+}
+
+void McuState::toggleBreakpoint(u16 position) {
     auto it = this->breakpoints.find(position);
 
     if (it != this->breakpoints.end()) {

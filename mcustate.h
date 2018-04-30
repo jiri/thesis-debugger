@@ -38,5 +38,6 @@ public slots:
     void reset();
     void run();
     void stop();
-    void toggleBreakpoint(const QModelIndex& index);
+    void toggleBreakpointIndex(const QModelIndex& index);
+    void toggleBreakpoint(u16 position);
 };

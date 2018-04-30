@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget* parent)
     this->instructionView = new InstructionView(this);
     connect(&McuState::instance(), &McuState::stateChanged, this->instructionView, &InstructionView::update);
     connect(&McuState::instance(), &McuState::stepped, this->instructionView, &InstructionView::scroll);
-    connect(this->instructionView, &InstructionView::doubleClicked, &McuState::instance(), &McuState::toggleBreakpoint);
+    connect(this->instructionView, &InstructionView::doubleClicked, &McuState::instance(), &McuState::toggleBreakpointIndex);
 
     this->registerView = new RegisterView(this);
     connect(&McuState::instance(), &McuState::stateChanged, this->registerView, &RegisterView::update);
