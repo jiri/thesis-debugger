@@ -49,6 +49,7 @@ bool MemoryModel::setData(const QModelIndex& index, const QVariant& value, int r
     if (role == Qt::EditRole) {
         McuState::instance().mcu.memory[index.row() * 0x10 + index.column()] = value.toString().toUShort(nullptr, 16);
         emit dataChanged(index, index);
+        McuState::instance().stateChanged();
         return true;
     }
     return false;
