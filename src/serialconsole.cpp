@@ -10,6 +10,7 @@ SerialConsole::SerialConsole(QWidget *parent)
     this->setLayout(new QVBoxLayout);
 
     this->textEdit = new QPlainTextEdit;
+    this->textEdit->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
     this->lineEdit = new QLineEdit;
 
     this->layout()->addWidget(this->textEdit);
@@ -21,5 +22,8 @@ SerialConsole::SerialConsole(QWidget *parent)
 }
 
 void SerialConsole::sendChar(char chr) {
+    if (chr == 0x00) {
+        chr = '\n';
+    }
     this->textEdit->insertPlainText(QString(chr));
 }
