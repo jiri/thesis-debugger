@@ -1,12 +1,12 @@
 #pragma once
 
-#include <vector>
 #include <set>
+#include <vector>
+#include <queue>
 
 #include <QObject>
 #include <QModelIndex>
 #include <QTimer>
-#include <QQueue>
 
 #include <Mcu.hpp>
 
@@ -31,7 +31,7 @@ public:
 
     static McuState& instance();
 
-    QQueue<u8> serialQueue = {};
+    std::queue<u8> serialQueue = {};
     SerialConsole* serialConsole = nullptr;
 
     u8 buttonBuffer = 0;

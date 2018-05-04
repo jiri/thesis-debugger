@@ -62,7 +62,7 @@ McuState::McuState(QObject *parent)
                 }
 
                 u8 tmp = this->serialQueue.front();
-                this->serialQueue.pop_front();
+                this->serialQueue.pop();
                 return tmp;
             },
             .set = [this](u8 chr) {
@@ -184,7 +184,7 @@ void McuState::toggleBreakpoint(u16 position) {
 
 void McuState::serialSend(QString line) {
     for (QChar c : line) {
-        this->serialQueue.append(c.toLatin1());
+        this->serialQueue.push(c.toLatin1());
     }
     this->mcu.interrupts.serial = true;
 }
