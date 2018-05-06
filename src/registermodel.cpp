@@ -46,7 +46,7 @@ QVariant RegisterModel::data(const QModelIndex& index, int role) const {
         return QVariant::String;
     }
 
-    return {};
+    return QAbstractTableModel::data(index, role);
 }
 
 bool RegisterModel::setData(const QModelIndex& index, const QVariant& value, int role) {
@@ -88,7 +88,7 @@ QVariant RegisterModel::headerData(int section, Qt::Orientation orientation, int
         return Qt::AlignLeft;
     }
 
-    return {};
+    return QAbstractTableModel::headerData(section, orientation, role);
 }
 
 Qt::ItemFlags RegisterModel::flags(const QModelIndex& index) const {
