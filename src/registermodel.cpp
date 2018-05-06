@@ -10,7 +10,7 @@ RegisterModel::RegisterModel(QObject* parent)
 
 int RegisterModel::rowCount(const QModelIndex& parent) const {
     Q_UNUSED(parent);
-    return McuState::instance().mcu.registers.size();
+    return McuState::instance().mcu.registers.size() + 2;
 }
 
 int RegisterModel::columnCount(const QModelIndex& parent) const {
@@ -19,11 +19,21 @@ int RegisterModel::columnCount(const QModelIndex& parent) const {
 }
 
 QVariant RegisterModel::data(const QModelIndex& index, int role) const {
-    Q_ASSERT(index.column() == 0);
-    Q_ASSERT(index.column() < McuState::instance().mcu.registers.size());
+    Q_ASSERT(index.isValid());
 
     if (role == Qt::DisplayRole) {
-        return { QString("%1").arg(McuState::instance().mcu.registers[index.row()], 2, 16, QChar('0')).toUpper() };
+        u16 value = 0;
+        switch (index.row()) {
+            case 16:
+                value = McuState::instance().mcu.pc;
+                break;
+            case 17:
+                value = McuState::instance().mcu.sp;
+                break;
+            default:
+                value = McuState::instance().mcu.registers[index.row()];
+        }
+        return { QString("%1").arg(value, 2, 16, QChar('0')).toUpper() };
     }
 
     if (role == Qt::FontRole) {
@@ -41,7 +51,17 @@ QVariant RegisterModel::data(const QModelIndex& index, int role) const {
 
 bool RegisterModel::setData(const QModelIndex& index, const QVariant& value, int role) {
     if (role == Qt::EditRole) {
-        McuState::instance().mcu.registers[index.row()] = value.toString().toUShort(nullptr, 16);
+        u16 val = value.toString().toUShort(nullptr, 16);
+        switch (index.row()) {
+            case 16:
+                McuState::instance().mcu.pc = val;
+                break;
+            case 17:
+                McuState::instance().mcu.sp = val;
+                break;
+            default:
+                McuState::instance().mcu.registers[index.row()] = val;
+        }
         emit dataChanged(index, index);
         return true;
     }
@@ -53,7 +73,15 @@ QVariant RegisterModel::headerData(int section, Qt::Orientation orientation, int
         if (orientation == Qt::Horizontal && section == 0) {
             return QString("Value");
         }
-        return QString("R%1").arg(section);
+        switch (section) {
+            case 16:
+                return "PC";
+            case 17:
+                return "SP";
+            default:
+                return QString("R%1").arg(section);
+        }
+
     }
 
     if (role == Qt::TextAlignmentRole) {
