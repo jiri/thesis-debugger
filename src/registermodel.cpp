@@ -46,7 +46,7 @@ QVariant RegisterModel::data(const QModelIndex& index, int role) const {
         return QVariant::String;
     }
 
-    return QAbstractTableModel::data(index, role);
+    return {};
 }
 
 bool RegisterModel::setData(const QModelIndex& index, const QVariant& value, int role) {
