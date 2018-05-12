@@ -18,6 +18,7 @@ SerialConsole::SerialConsole(QWidget *parent)
 
     connect(this->lineEdit, &QLineEdit::returnPressed, [this] {
         McuState::instance().serialSend(this->lineEdit->text());
+        this->lineEdit->clear();
     });
 }
 
@@ -26,4 +27,9 @@ void SerialConsole::sendChar(char chr) {
         chr = '\n';
     }
     this->textEdit->insertPlainText(QString(chr));
+}
+
+void SerialConsole::reset() {
+    this->lineEdit->clear();
+    this->textEdit->clear();
 }

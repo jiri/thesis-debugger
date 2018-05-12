@@ -15,4 +15,5 @@ private:
 
 public slots:
     void sendChar(char chr);
+    void reset();
 };

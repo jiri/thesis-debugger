@@ -208,6 +208,10 @@ void McuState::reset() {
 
     emit stepped();
     emit stateChanged();
+
+    if (this->serialConsole) {
+        this->serialConsole->reset();
+    }
 }
 
 void McuState::run() {
