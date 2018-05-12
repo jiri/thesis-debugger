@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget* parent)
     /* Toolbar */
     auto* toolBar = new QToolBar;
     toolBar->setMovable(false);
+    toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
     toolBar->addAction(QIcon::fromTheme("document-open"), "&Open...", this, &MainWindow::open);
     toolBar->actions().last()->setShortcuts(QKeySequence::Open);
