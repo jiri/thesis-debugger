@@ -150,7 +150,7 @@ void McuState::load(const QByteArray& binary) {
 }
 
 void McuState::loadSymbols(const QByteArray& json) {
-    McuState::instance().labels = {};
+    this->labels = {};
     QJsonParseError error {};
     QJsonObject d = QJsonDocument::fromJson(json, &error).object();
 
@@ -177,6 +177,8 @@ void McuState::loadSymbols(const QByteArray& json) {
             this->labels[position] = key;
         }
     }
+
+    this->disassemble();
 }
 
 void McuState::step() {
@@ -347,7 +349,8 @@ void McuState::disassemble() {
                 auto addr = read_word();
                 instruction.binary.push_back(high_byte(addr));
                 instruction.binary.push_back(low_byte(addr));
-                instruction.print = fmt::format("{} 0x{:X}", opcode_str(opcode), addr);
+                auto addrstr = this->labels.count(addr) == 0 ? fmt::format("0x{:X}", addr) : this->labels[addr].toStdString();
+                instruction.print = fmt::format("{} {}", opcode_str(opcode), addrstr);
                 break;
             }
             case IN:
