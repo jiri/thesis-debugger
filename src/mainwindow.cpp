@@ -92,12 +92,19 @@ void MainWindow::update() {
 
 void MainWindow::open() {
     QFile file { QFileDialog::getOpenFileName(this) };
-
     if (!file.open(QIODevice::ReadOnly)) {
         return;
     }
-
     McuState::instance().load(file.readAll());
+
+    /* Load symbols if possible */
+    QFile symfile { file.fileName() + ".sym" };
+    if (!symfile.exists() || !symfile.open(QIODevice::ReadOnly)) {
+        this->update();
+        return;
+    }
+    McuState::instance().loadSymbols(symfile.readAll());
+
     this->update();
 }
 
