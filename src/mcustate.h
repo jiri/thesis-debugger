@@ -13,8 +13,13 @@
 #include "serialconsole.hpp"
 #include "playerview.hpp"
 
-class McuState : public QObject
-{
+struct DisassembledInstruction {
+    u16 position;
+    std::vector<u8> binary;
+    std::string print;
+};
+
+class McuState : public QObject {
     Q_OBJECT
 public:
     explicit McuState(QObject *parent = nullptr);
@@ -30,6 +35,8 @@ public:
     std::set<u16> breakpoints = {};
 
     static McuState& instance();
+
+    void disassemble();
 
     std::queue<u8> serialQueue = {};
     SerialConsole* serialConsole = nullptr;

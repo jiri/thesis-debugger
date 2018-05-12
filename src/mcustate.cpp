@@ -1,11 +1,12 @@
-#include <Mcu.hpp>
+#include "mcustate.h"
 
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QErrorMessage>
 
-#include "mcustate.h"
+#include <Mcu.hpp>
+#include <opcodes.hpp>
 
 Q_GLOBAL_STATIC(McuState, mcuState)
 
@@ -16,6 +17,55 @@ namespace {
         error->setAttribute(Qt::WA_DeleteOnClose);
         error->showMessage(e.what());
     }
+
+    std::string opcode_str(u8 opcode) {
+        switch (opcode) {
+            case NOP:   return "nop";
+            case SLEEP: return "sleep";
+            case BREAK: return "break";
+            case SEI:   return "sei";
+            case SEC:   return "sec";
+            case SEZ:   return "sez";
+            case CLI:   return "cli";
+            case CLC:   return "clc";
+
+            case CLZ:   return "clz";
+            case ADD:   return "add";
+            case ADC:   return "adc";
+            case SUB:   return "sub";
+            case SBC:   return "sbc";
+            case INC:   return "inc";
+            case DEC:   return "dec";
+            case AND:   return "and";
+            case OR:    return "or";
+            case XOR:   return "xor";
+            case CP:    return "cp ";
+
+            case CPI:   return "cpi";
+            case JMP:   return "jmp";
+            case CALL:  return "call";
+            case RET:   return "ret";
+            case RETI:  return "reti";
+            case BRC:   return "brc";
+            case BRNC:  return "brnc";
+            case BRZ:   return "brz";
+            case BRNZ:  return "brnz";
+
+            case MOV:   return "mov";
+            case LDI:   return "ldi";
+            case LD:    return "ld";
+            case ST:    return "st";
+            case PUSH:  return "push";
+            case POP:   return "pop";
+            case LPM:   return "lpm";
+            case IN:    return "in";
+            case OUT:   return "out";
+
+            default:
+                throw illegal_opcode_error { opcode };
+        }
+    }
+
 }
 
 McuState::McuState(QObject *parent)
@@ -51,7 +101,7 @@ McuState::McuState(QObject *parent)
         emit stateChanged();
     });
 
-    this->disassembly = this->mcu.disassemble();
+    this->disassemble();
     emit stepped();
 
     /* I/O handlers */
@@ -94,7 +144,7 @@ void McuState::load(const QByteArray& binary) {
         program[i] = binary.at(i);
     }
     this->mcu.load_program(program);
-    this->disassembly = this->mcu.disassemble();
+    this->disassemble();
     this->reset();
     emit stateChanged();
 }
@@ -146,7 +196,9 @@ void McuState::reset() {
     this->labels = {};
     this->breakpoints = {};
 
-    for (auto& inst : this->mcu.disassemble()) {
+    this->disassemble();
+
+    for (auto& inst : this->disassembly) {
         if (inst.binary[0] == 0x03) {
             this->breakpoints.insert(inst.position);
         }
@@ -200,4 +252,124 @@ void McuState::showPlayer() {
 void McuState::pressButton(u8 mask) {
     this->mcu.interrupts.button = true;
     this->buttonBuffer |= mask;
+}
+
+void McuState::disassemble() {
+    u16 pc = 0x0000;
+    this->disassembly.clear();
+
+    auto read_byte = [&]() {
+        return mcu.program[pc++];
+    };
+
+    auto read_register_pair = [&]() -> std::pair<u8, u8> {
+        u8 byte = read_byte();
+        return { high_nibble(byte), low_nibble(byte) };
+    };
+
+    auto read_register = [&]() {
+        return read_register_pair().second;
+    };
+
+    auto read_word = [&]() {
+        u8 high = read_byte();
+        u8 low  = read_byte();
+
+        return static_cast<u16>(high << 8u | low);
+    };
+
+    while (true) {
+        DisassembledInstruction instruction {
+            .position = pc,
+            .binary = {},
+            .print = {},
+        };
+
+        u8 opcode = read_byte();
+        instruction.binary.push_back(opcode);
+
+        switch (opcode) {
+            case NOP:
+            case SLEEP:
+            case BREAK:
+            case SEI:
+            case SEC:
+            case SEZ:
+            case CLI:
+            case CLC:
+            case CLZ:
+            case RET:
+            case RETI: {
+                instruction.print = opcode_str(opcode);
+                break;
+            }
+            case ADD:
+            case ADC:
+            case SUB:
+            case SBC:
+            case AND:
+            case OR:
+            case XOR:
+            case CP:
+            case MOV: {
+                auto [ rDst, rSrc ] = read_register_pair();
+                instruction.binary.push_back(rDst << 4u | rSrc);
+                instruction.print = fmt::format("{} R{}, R{}", opcode_str(opcode), rDst, rSrc);
+                break;
+            }
+            case LD:
+            case ST:
+            case LPM:
+            case INC:
+            case DEC:
+            case PUSH:
+            case POP: {
+                auto rDst = read_register();
+                instruction.binary.push_back(rDst);
+                instruction.print = fmt::format("{} R{}", opcode_str(opcode), rDst);
+                break;
+            }
+            case CPI:
+            case LDI: {
+                auto reg = read_register();
+                auto val = read_byte();
+                instruction.binary.push_back(reg);
+                instruction.binary.push_back(val);
+                instruction.print = fmt::format("{} R{}, 0x{:X}", opcode_str(opcode), reg, val);
+                break;
+            }
+            case JMP:
+            case CALL:
+            case BRC:
+            case BRNC:
+            case BRZ:
+            case BRNZ: {
+                auto addr = read_word();
+                instruction.binary.push_back(high_byte(addr));
+                instruction.binary.push_back(low_byte(addr));
+                instruction.print = fmt::format("{} 0x{:X}", opcode_str(opcode), addr);
+                break;
+            }
+            case IN:
+            case OUT: {
+                auto rSrc = read_register();
+                auto addr = read_byte();
+                instruction.binary.push_back(rSrc);
+                instruction.binary.push_back(addr);
+                instruction.print = fmt::format("{} R{}, 0x{:X}", opcode_str(opcode), rSrc, addr);
+                break;
+            }
+            default: {
+                instruction.print = "ILLEGAL OPCODE";
+                break;
+            }
+        }
+
+        this->disassembly.push_back(instruction);
+
+        // Overflow
+        if (pc == 0x0000) {
+            break;
+        }
+    }
 }
