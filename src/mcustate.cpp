@@ -105,7 +105,7 @@ McuState::McuState(QObject *parent)
     emit stepped();
 
     /* I/O handlers */
-    mcu.io_handlers[0x10] = IoHandler {
+    mcu.io_handlers[0x03] = IoHandler {
             .get = [this]() -> u8 {
                 if (this->serialQueue.empty()) {
                     return 0x00;
